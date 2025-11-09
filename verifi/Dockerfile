@@ -1,5 +1,5 @@
 # Step 1: Use an official OpenJDK 21 runtime as base image
-FROM azul/zulu-openjdk
+FROM azul/zulu-openjdk:21
 
 # Step 2: Set the working directory inside the container
 WORKDIR /app

@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: verifi-mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: verifi-mongo
+  template:
+    metadata:
+      labels:
+        app: verifi-mongo
+    spec:
+      containers:
+        - name: verifi-mongo
+          image: mongo:latest
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-data
+              mountPath: /data/db
+      volumes:
+        - name: mongo-data
+          emptyDir: {}  # for local dev; use PersistentVolumeClaim for production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: verifi-mongo
+spec:
+  selector:
+    app: verifi-mongo
+  ports:
+    - port: 27017
+      targetPort: 27017

@@ -1,0 +1,75 @@
+pipeline {
+    agent any
+
+    tools {
+        jdk 'Zulu-21'       // Your JDK configured in Jenkins
+        maven 'Maven3'      // Your Maven configured in Jenkins
+    }
+
+    triggers {
+        // Run every 5 minutes
+        cron('H/5 * * * *')
+    }
+
+    stages {
+        stage("Checkout") {
+            steps {
+                git url: 'https://github.com/RichardCypher4/Backend-AI-Agent.git', branch: 'main'
+            }
+        }
+
+        stage("Build & Test") {
+            steps {
+                dir('verifi') {
+                    // Clean, compile, run tests, generate JaCoCo report
+                    bat "mvn clean verify"
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            emailext(
+                to: 'oladayorichard1@gmail.com',
+                subject: "✅ SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                <h3>Build Successful!</h3>
+                <p>Job: ${env.JOB_NAME}</p>
+                <p>Build Number: ${env.BUILD_NUMBER}</p>
+                <p>URL: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+                """,
+                mimeType: 'text/html'
+            )
+        }
+
+        failure {
+            emailext(
+                to: 'oladayorichard1@gmail.com',
+                subject: "❌ FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                <h3>Build Failed!</h3>
+                <p>Job: ${env.JOB_NAME}</p>
+                <p>Build Number: ${env.BUILD_NUMBER}</p>
+                <p>URL: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+                """,
+                mimeType: 'text/html'
+            )
+        }
+
+        always {
+            echo "Publishing JaCoCo HTML report..."
+            publishHTML(target: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'verifi/target/site/jacoco',
+                reportFiles: 'index.html',
+                reportName: 'JaCoCo Coverage'
+            ])
+
+            echo "Cleaning workspace..."
+            cleanWs()
+        }
+    }
+}

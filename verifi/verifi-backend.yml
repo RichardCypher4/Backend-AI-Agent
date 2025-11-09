@@ -1,0 +1,36 @@
+# verifi-backend.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: verifi-backend-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: verifi-backend
+  template:
+    metadata:
+      labels:
+        app: verifi-backend
+    spec:
+      containers:
+        - name: verifi-backend
+          image: richardcypher1234/dispute-backend:latest
+          ports:
+            - containerPort: 8082
+          env:
+            - name: SPRING_DATA_MONGODB_URI
+              value: mongodb://verifi-mongo:27017/verifi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: verifi-backend-service
+spec:
+  selector:
+    app: verifi-backend
+  ports:
+    - protocol: TCP
+      port: 8082
+      targetPort: 8082
+  type: LoadBalancer
