@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        jdk 'Zulu-21'       // Your JDK configured in Jenkins
+        jdk 'zulu-21'       // Your JDK configured in Jenkins
         maven 'Maven3'      // Your Maven configured in Jenkins
     }
 
