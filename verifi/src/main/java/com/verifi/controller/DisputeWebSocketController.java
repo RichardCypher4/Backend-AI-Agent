@@ -14,7 +14,7 @@ public class DisputeWebSocketController {
         this.messagingTemplate = messagingTemplate;
     }
 
-    // Endpoint to test WebSocket
+    // REST endpoint to send dispute updates via WebSocket
     @PostMapping("/send")
     public String sendDisputeUpdate(@RequestBody Dispute dispute) {
         messagingTemplate.convertAndSend("/topic/disputes", dispute);
